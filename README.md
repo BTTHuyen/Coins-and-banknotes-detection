@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ![Darknet Logo](http://pjreddie.com/media/files/darknet-black-small.png)
 
 # Darknet #
@@ -8,3 +9,6 @@ For more information see the [Darknet project website](http://pjreddie.com/darkn
 For questions or issues please use the [Google Group](https://groups.google.com/forum/#!forum/darknet).
 # YOLO
 # YOLO
+=======
+# Coins-and-banknotes-detection
+>>>>>>> 7edc9036cb538ccac87e14668b3b95efad026081
