@@ -5,12 +5,34 @@ import subprocess
 import time
 import os
 
+def draw_depth(img, in_disp, boxes, classids, idxs, colors, labels):
+    tmp = np.array(img)
+    original_h, original_w = tmp.shape[:2]
+    depths = {}
+    if len(idxs) > 0:
+        for i in idxs.flatten():
+            # Get the bounding box coordinates
+            x, y = boxes[i][0], boxes[i][1]
+            w, h = boxes[i][2], boxes[i][3]
+
+            depths[i] = np.round(np.mean(in_disp[y:y+h, x:x+w]), 4)
+            
+            # Get the unique color for this class
+            color = [int(c) for c in colors[classids[i]]]
+
+            cv.rectangle(tmp, (x, y), (x+w, y+h), color, 2)
+            text = "{}: {:4f}".format(labels[classids[i]], depths[i])
+            cv.putText(tmp, text, (x, y-5), cv.FONT_HERSHEY_SIMPLEX, 0.5, color, 6)
+
+    return tmp, depths
+
 def show_image(img):
     cv.imshow("Image", img)
     cv.waitKey(0)
 
 def draw_labels_and_boxes(img, boxes, confidences, classids, idxs, colors, labels):
     # If there are any detections
+    tmp = img
     if len(idxs) > 0:
         for i in idxs.flatten():
             # Get the bounding box coordinates
@@ -21,11 +43,11 @@ def draw_labels_and_boxes(img, boxes, confidences, classids, idxs, colors, label
             color = [int(c) for c in colors[classids[i]]]
 
             # Draw the bounding box rectangle and label on the image
-            cv.rectangle(img, (x, y), (x+w, y+h), color, 2)
+            cv.rectangle(tmp, (x, y), (x+w, y+h), color, 2)
             text = "{}: {:4f}".format(labels[classids[i]], confidences[i])
-            cv.putText(img, text, (x, y-5), cv.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+            cv.putText(tmp, text, (x, y-5), cv.FONT_HERSHEY_SIMPLEX, 0.5, color, 6)
 
-    return img
+    return tmp
 
 
 def generate_boxes_confidences_classids(outs, height, width, tconf):
@@ -90,7 +112,7 @@ def infer_image(net, layer_names, height, width, img, colors, labels, FLAGS,
     if boxes is None or confidences is None or idxs is None or classids is None:
         raise '[ERROR] Required variables are set to None before drawing boxes on images.'
         
-    # Draw labels and boxes on the image
-    img = draw_labels_and_boxes(img, boxes, confidences, classids, idxs, colors, labels)
+    # # Draw labels and boxes on the image
+    # img = draw_labels_and_boxes(img, boxes, confidences, classids, idxs, colors, labels)
 
     return img, boxes, confidences, classids, idxs
